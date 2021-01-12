@@ -33,6 +33,8 @@ set(PROJECT_SOURCES
         mainwindow.h
         webconnector.h
         webconnector.cpp
+        untextedit.h
+        untextedit.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

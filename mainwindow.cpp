@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QCloseEvent>
+#include <QInputDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -15,7 +17,46 @@ MainWindow::MainWindow(QWidget *parent)
     mainWidget = new QWidget();
     mainLayout = new QHBoxLayout();
 
-    textEdit = new QTextEdit();
+    textEdit = new UnTextEdit();
+    connect(textEdit, &UnTextEdit::textChanged, this, [this]() {
+       textEdit->setIsTextChanged(true);
+    });
+
+    settings = new QSettings("Kernux", "KerNotes");
+
+    if(settings->value(FIRST_STARTUP).toString() == "" || settings->value(TYPE_SETTINGS).toString() == "")
+    {
+        QStringList items;
+        items << "HTML";
+        items << "MarkDown";
+        items << "Txt";
+
+        QInputDialog dialog;
+        dialog.setOptions(QInputDialog::UseListViewForComboBoxItems);
+        dialog.setComboBoxItems(items);
+        dialog.setWindowTitle("Choose File Type");
+        if(dialog.exec())
+        {
+            auto text = dialog.textValue();
+            qDebug() << text;
+            if(text == "HTML")
+            {
+                textEdit->setTextType(1);
+                settings->setValue(TYPE_SETTINGS, 1);
+            } else if(text == "MarkDown")
+            {
+                textEdit->setTextType(2);
+                settings->setValue(TYPE_SETTINGS, 2);
+            } else if(text == "Txt")
+            {
+                textEdit->setTextType(3);
+                settings->setValue(TYPE_SETTINGS, 3);
+            }
+            settings->setValue(FIRST_STARTUP, "0");
+        }
+    } else {
+        textEdit->setTextType(settings->value(TYPE_SETTINGS).toInt());
+    }
 
     model = new QDirModel();
 
@@ -31,11 +72,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     setCentralWidget(mainWidget);
 
-//    auto *openShortcut = new QShortcut(QKeySequence(tr("Ctrl+O", "File|Open")), nullptr);
-//    connect(openShortcut, &QShortcut::activated, &MainWindow::openFile);
+    auto *openShortcut = new QShortcut(this);
+    openShortcut->setKey(Qt::CTRL + Qt::Key_O);
+//    connect(openShortcut, &QShortcut::activated, &UnTextEdit::openFile);
 
-//    auto *saveShortcut = new QShortcut(QKeySequence(tr("Ctrl+S", "File|Save")), nullptr);
-//    connect(saveShortcut, &QShortcut::activated, &MainWindow::saveFile);
+    auto *saveShortcut = new QShortcut(this);
+    saveShortcut->setKey(Qt::CTRL + Qt::Key_S);
+//    connect(saveShortcut, &QShortcut::activated, &UnTextEdit::saveFile);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -44,45 +87,27 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
     view->setFixedWidth(this->width() * 1/4);
 
-}
-
-bool MainWindow::saveFile()
-{
-    if(!(this->fileName == "")) {
-            QFile file(this->fileName);
-            if(file.open(QIODevice::ReadWrite))
-            {
-                file.write(textEdit->toPlainText().toUtf8());
-
-                qDebug() << "File Saved";
-            } else {
-                return false;
-            }
-            file.close();
-            return true;
-        } else {
-        return false;
-    }
+    qDebug() << "I'm resized)";
 
 }
 
-bool MainWindow::openFile()
+void MainWindow::closeEvent (QCloseEvent *event)
 {
-    this->fileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::currentPath(), "Text Files (*.md *.html *.txt)");
-    if(this->fileName == "")
-    {
-        qDebug() << "File path clear!";
-        return false;
+    if(textEdit->getIsTextChanged()) {
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "KerNotes",
+                                                                tr("Are you sure?\n"),
+                                                            QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
+                                                                QMessageBox::Yes);
+    if (resBtn != QMessageBox::Yes) {
+        event->ignore();
     } else {
-        qDebug() << "File path is not clear";
-        QFile file(this->fileName);
-        if(file.open(QIODevice::ReadOnly))
-        textEdit->setText(file.readAll());
-        file.close();
-        return true;
+        event->accept();
     }
-
+} else {
+        event->ignore();
+    }
 }
+
 
 QToolBar *MainWindow::createToolbar()
 {
@@ -95,10 +120,10 @@ QToolBar *MainWindow::createToolbar()
     QMenu *menu = new QMenu();
 
     auto *openFileAction = new QAction("Open...");
-    connect(openFileAction, &QAction::triggered, this, &MainWindow::openFile);
+    connect(openFileAction, &QAction::triggered, textEdit, &UnTextEdit::openFile);
 
     auto *saveFileAction = new QAction("Save...");
-    connect(saveFileAction, &QAction::triggered, this, &MainWindow::saveFile);
+    connect(saveFileAction, &QAction::triggered, textEdit, &UnTextEdit::saveFile);
 
     menu->addAction(openFileAction);
     menu->addAction(saveFileAction);
@@ -115,4 +140,3 @@ QToolBar *MainWindow::createToolbar()
 MainWindow::~MainWindow()
 {
 }
-
