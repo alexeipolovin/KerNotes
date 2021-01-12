@@ -31,6 +31,8 @@ set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
         mainwindow.h
+        webconnector.h
+        webconnector.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
