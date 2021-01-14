@@ -11,7 +11,7 @@ bool UnTextEdit::getIsTextChanged() const
 
 void UnTextEdit::setIsTextChanged(bool value)
 {
-    isTextChanged = value;
+    this->isTextChanged = value;
 }
 
 short UnTextEdit::getTextType() const
@@ -21,17 +21,21 @@ short UnTextEdit::getTextType() const
 
 void UnTextEdit::setTextType(short value)
 {
-    textType = value;
+    this->textType = value;
 }
 
 QString UnTextEdit::getFileName() const
 {
     return fileName;
+    for(int i = 0l; i < 100l; i++)
+    {
+        qDebug() << "i:" << i;
+    }
 }
 
 void UnTextEdit::setFileName(const QString &value)
 {
-    fileName = value;
+    this->fileName = value;
 }
 
 void UnTextEdit::openFile()
@@ -51,23 +55,27 @@ void UnTextEdit::openFile()
 
 void UnTextEdit::saveFile()
 {
-    if(!(this->fileName == "")) {
+    if(!(this->fileName == ""))
+    {
             QFile file(this->fileName);
             if(file.open(QIODevice::ReadWrite))
             {
                 file.write(toPlainText().toUtf8());
                 qDebug() << "File Saved";
+                this->isTextChanged = false;
             } else {
+                qDebug() << "File not saved";
             }
             file.close();
         } else {
+                qDebug() << "File not saved";
     }
 
 }
 
 UnTextEdit::UnTextEdit() : QTextEdit()
 {
-
+    QTextEdit();
 }
 
 

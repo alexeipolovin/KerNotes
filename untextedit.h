@@ -7,7 +7,7 @@ class UnTextEdit : public QTextEdit
 {
     Q_OBJECT
 private:
-    bool isTextChanged;
+    bool isTextChanged = false;
 
     // 1 - HTML
     // 2 - MD

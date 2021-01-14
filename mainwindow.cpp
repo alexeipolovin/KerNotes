@@ -12,13 +12,17 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+
+    textEdit = new UnTextEdit();
+
     addToolBar(createToolbar());
 
     mainWidget = new QWidget();
     mainLayout = new QHBoxLayout();
 
-    textEdit = new UnTextEdit();
-    connect(textEdit, &UnTextEdit::textChanged, this, [this]() {
+
+    connect(textEdit, &UnTextEdit::textChanged, this, [this]()
+    {
        textEdit->setIsTextChanged(true);
     });
 
@@ -74,11 +78,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto *openShortcut = new QShortcut(this);
     openShortcut->setKey(Qt::CTRL + Qt::Key_O);
-//    connect(openShortcut, &QShortcut::activated, &UnTextEdit::openFile);
+    connect(openShortcut, &QShortcut::activated, textEdit, &UnTextEdit::openFile);
 
     auto *saveShortcut = new QShortcut(this);
     saveShortcut->setKey(Qt::CTRL + Qt::Key_S);
-//    connect(saveShortcut, &QShortcut::activated, &UnTextEdit::saveFile);
+    connect(saveShortcut, &QShortcut::activated, textEdit, &UnTextEdit::saveFile);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -98,13 +102,14 @@ void MainWindow::closeEvent (QCloseEvent *event)
                                                                 tr("Are you sure?\n"),
                                                             QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
                                                                 QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes) {
+    if (resBtn != QMessageBox::Yes)
+    {
         event->ignore();
     } else {
         event->accept();
     }
 } else {
-        event->ignore();
+        event->accept();
     }
 }
 
@@ -119,11 +124,11 @@ QToolBar *MainWindow::createToolbar()
 
     QMenu *menu = new QMenu();
 
-    auto *openFileAction = new QAction("Open...");
-    connect(openFileAction, &QAction::triggered, textEdit, &UnTextEdit::openFile);
+    QAction *openFileAction = new QAction("Open...");
+    connect(openFileAction, &QAction::triggered, this->textEdit, &UnTextEdit::openFile);
 
-    auto *saveFileAction = new QAction("Save...");
-    connect(saveFileAction, &QAction::triggered, textEdit, &UnTextEdit::saveFile);
+    QAction *saveFileAction = new QAction("Save...");
+    connect(saveFileAction, &QAction::triggered, this->textEdit, &UnTextEdit::saveFile);
 
     menu->addAction(openFileAction);
     menu->addAction(saveFileAction);
