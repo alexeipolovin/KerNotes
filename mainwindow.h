@@ -9,6 +9,7 @@
 #include <QToolBar>
 #include <QTreeView>
 #include "untextedit.h"
+#include "webconnector.h"
 
 
 #define TYPE_SETTINGS "settings/file_type"
@@ -19,8 +20,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    QToolBar *toolBar;
+    WebConnector *webConnector;
 
+    QToolBar *toolBar;
     QToolBar *createToolbar();
 
     QWidget *mainWidget;

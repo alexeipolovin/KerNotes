@@ -2,22 +2,19 @@
 #define WEBCONNECTOR_H
 
 #include <QtNetwork/QNetworkAccessManager>
+#include <QSettings>
 #include <QUrl>
+#include <QObject>
 
 class WebConnector : public QObject
 {
-private:
-
-    QNetworkAccessManager *manager;
-
-    QUrl serverUrl;
-
+Q_OBJECT
 public:
-    Q_OBJECT
 
     WebConnector();
 
-    enum REQUEST_TYPE {
+    enum REQUEST_TYPE
+    {
         CHECK_SELF_UPDATES,
         CHECK_DATA_UPDATES,
         UPDATE_SERVER_INFO,
@@ -29,7 +26,19 @@ public:
 
     QNetworkRequest* createRequest(REQUEST_TYPE type);
 
-    void sendRequest(QNetworkRequest &request, REQUEST_TYPE type);
+    void sendRequest(QNetworkRequest *request, REQUEST_TYPE type);
+
+private:
+    QJsonObject parseReply(QNetworkReply *reply, WebConnector::REQUEST_TYPE type);
+
+    QNetworkAccessManager *manager;
+
+    QSettings *settings;
+
+    QUrl serverUrl;
+signals:
+    void newVersionAvailable();
+    void autoUpdatesUnknown();
 };
 
 #endif // WEBCONNECTOR_H

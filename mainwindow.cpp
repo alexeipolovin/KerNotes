@@ -9,11 +9,29 @@
 #include <QCloseEvent>
 #include <QInputDialog>
 
+#define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
 
     textEdit = new UnTextEdit();
+
+    webConnector = new WebConnector();
+
+    connect(webConnector, &WebConnector::autoUpdatesUnknown, this, [this]() {
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "KerNotes",
+                                    tr("Check updates automatically\n"),
+                                    QMessageBox::No | QMessageBox::Yes,
+                                    QMessageBox::Yes);
+        if(resBtn == QMessageBox::Yes)
+        {
+            settings->setValue(AUTO_UPDATES, true);
+        } else {
+            settings->setValue(AUTO_UPDATES, false);
+        }
+    });
+
 
     addToolBar(createToolbar());
 
