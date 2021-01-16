@@ -23,6 +23,7 @@ public:
     bool getIsTextChanged() const;
     void setIsTextChanged(bool value);
 
+    uint8_t type;
     short getTextType() const;
     void setTextType(short value);
 

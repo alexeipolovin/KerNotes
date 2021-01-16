@@ -42,10 +42,12 @@ private:
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
     void resizeEvent(QResizeEvent *event);
-
-    ~MainWindow();
     void closeEvent(QCloseEvent *event);
+public slots:
+    void updateUnknown();
+    void TreeViewDoubleClick(const QModelIndex &index);
 };
 #endif // MAINWINDOW_H

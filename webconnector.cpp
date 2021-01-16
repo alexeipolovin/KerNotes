@@ -11,10 +11,15 @@
 WebConnector::WebConnector()
 {
     qDebug() << "WebConnector initialized";
-    settings = new QSettings();
+    settings = new QSettings("Kernux", "KerNotes");
+}
+
+void WebConnector::checkUpdates()
+{
     // Auto Updates Setup Checking (Win/Mac solution only?)
-    if(settings->value(AUTO_UPDATES).toString() != "")
+    if(this->settings->value(AUTO_UPDATES).toString() != "")
     {
+        qDebug() << settings->value(AUTO_UPDATES).toString();
         if(settings->value(AUTO_UPDATES).toBool() == true)
         {
             QNetworkRequest *request = createRequest(CHECK_SELF_UPDATES);
@@ -23,8 +28,11 @@ WebConnector::WebConnector()
         }
     } else {
         // Try something different
+        qDebug() << "Unknown state";
+        qDebug() << settings->value(AUTO_UPDATES).toString();
         emit autoUpdatesUnknown();
     }
+
 }
 
 void WebConnector::setServerUrl(const QUrl &value)

@@ -28,6 +28,7 @@ public:
 
     void sendRequest(QNetworkRequest *request, REQUEST_TYPE type);
 
+    void checkUpdates();
 private:
     QJsonObject parseReply(QNetworkReply *reply, WebConnector::REQUEST_TYPE type);
 

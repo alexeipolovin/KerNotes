@@ -25,6 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #endif()
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
+#set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/app_icon.rc")
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
 find_package(QT${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
 
@@ -36,6 +37,9 @@ set(PROJECT_SOURCES
         webconnector.cpp
         untextedit.h
         untextedit.cpp
+        settingswindow.h
+        settingswindow.cpp
+        res.qrc
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

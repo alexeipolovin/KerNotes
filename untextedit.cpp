@@ -79,4 +79,6 @@ UnTextEdit::UnTextEdit() : QTextEdit()
 }
 
 
-UnTextEdit::~UnTextEdit(){}
+UnTextEdit::~UnTextEdit(){
+    free(&textType);
+}
