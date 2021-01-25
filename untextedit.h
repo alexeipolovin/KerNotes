@@ -32,8 +32,10 @@ public:
 
 public slots:
     void openFile();
-
     void saveFile();
+
+    void placeBoldText();
+    void placeCursText();
 };
 
 #endif // UNTEXTEDIT_H

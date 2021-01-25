@@ -16,7 +16,7 @@ WebConnector::WebConnector()
 
 void WebConnector::checkUpdates()
 {
-    // Auto Updates Setup Checking (Win/Mac solution only?)
+    // Auto Updates setup checking (Win/Mac solution only?)
     if(this->settings->value(AUTO_UPDATES).toString() != "")
     {
         qDebug() << settings->value(AUTO_UPDATES).toString();
@@ -51,7 +51,7 @@ QJsonObject WebConnector::parseReply(QNetworkReply *reply, WebConnector::REQUEST
    QJsonObject root = document.object();
    switch(type)
    {
-   case CHECK_DATA_UPDATES:
+   case CHECK_SELF_UPDATES:
    {
       int version = root.find("version").value().toInt();
 
@@ -60,7 +60,14 @@ QJsonObject WebConnector::parseReply(QNetworkReply *reply, WebConnector::REQUEST
         {
             emit newVersionAvailable();
         }
+      break;
    }
+   case CHECK_DATA_UPDATES: {
+       // What the fuck?
+        break;
+   }
+   default:
+       break;
    }
    return root;
 }
@@ -78,6 +85,8 @@ void WebConnector::sendRequest(QNetworkRequest *request, WebConnector::REQUEST_T
             });
             break;
         }
+        default:
+            return;
 
     }
 }

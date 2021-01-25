@@ -9,6 +9,9 @@
 #include <QShortcut>
 #include <QCloseEvent>
 #include <QInputDialog>
+#include <QMessageBox>
+#include "libraries/markdownhighlighter.h"
+#include "libraries/qjsonmodel.h"
 
 #define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
 
@@ -19,17 +22,31 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     textEdit = new UnTextEdit();
+    previewTextEdit = new QTextEdit();
+    previewTextEdit->setReadOnly(true);
+
+    auto doc = this->textEdit->document();
+    auto *highliter = new MarkdownHighlighter(doc);
+    qDebug() << highliter;
 
     addToolBar(createToolbar());
 
     mainWidget = new QWidget();
     mainLayout = new QHBoxLayout();
 
-
-    connect(textEdit, &UnTextEdit::textChanged, this, [this]()
+    connect(textEdit, &UnTextEdit::textChanged, this, [this] ()
     {
        textEdit->setIsTextChanged(true);
        setWindowTitle(textEdit->getFileName() +STANDART_TITLE);
+       if(!this->shown) {
+       if(previewTextEdit->toPlainText().length() > 5000)
+       {
+           QMessageBox::warning(nullptr, "Too large file", "Your file is too large, live preview will be disabled");
+           this->shown = true;
+       } else {
+            this->previewTextEdit->setMarkdown(this->textEdit->toMarkdown());
+       }
+       }
     });
 
     settings = new QSettings("Kernux", "KerNotes");
@@ -68,16 +85,41 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         textEdit->setTextType(settings->value(TYPE_SETTINGS).toInt());
     }
-
-    model = new QDirModel();
-
-    view = new QTreeView();
+    QString json = R"({
+                       "firstName": "John",
+                       "lastName": "Smith",
+                       "age": 25,
+                       "address":
+                       {
+                           "streetAddress": "21 2nd Street",
+                           "city": "New York",
+                           "state": "NY",
+                           "postalCode": "10021"
+                       },
+                       "phoneNumber":
+                       [
+                           {
+                             "type": "home",
+                             "number": "212 555-1234"
+                           },
+                           {
+                             "type": "fax",
+                             "number": "646 555-4567"
+                           }
+                       ]
+                   })";
+    view = new QTreeView;
+    model = new QJsonModel;
     view->setModel(model);
-    view->setRootIndex(model->index(QDir::currentPath()));
+    model->loadJson(json.toUtf8());
+//    view = new QTreeView;
+//    view->setModel(model);
+//    view->setRootIndex(model->index(QDir::currentPath()));
     view->setFixedWidth(this->width() * 1/4);
 
     mainLayout->addWidget(view);
     mainLayout->addWidget(textEdit);
+    mainLayout->addWidget(previewTextEdit);
 
     mainWidget->setLayout(mainLayout);
 
@@ -93,6 +135,20 @@ MainWindow::MainWindow(QWidget *parent)
     saveShortcut->setKey(Qt::CTRL + Qt::Key_S);
     connect(saveShortcut, &QShortcut::activated, textEdit, &UnTextEdit::saveFile);
 
+    auto *boldShortcut = new QShortcut(this);
+    boldShortcut->setKey(Qt::CTRL + Qt::Key_B);
+    connect(boldShortcut, &QShortcut::activated, textEdit, &UnTextEdit::placeBoldText);
+
+    auto *cursShortcut = new QShortcut(this);
+    cursShortcut->setKey(Qt::CTRL + Qt::Key_I);
+    connect(cursShortcut, &QShortcut::activated, textEdit, &UnTextEdit::placeCursText);
+
+    auto *previewShortcut = new QShortcut(this);
+    previewShortcut->setKey(Qt::CTRL + Qt::Key_P);
+    connect(previewShortcut, &QShortcut::activated, this, [this](){
+        this->previewTextEdit->setMarkdown(textEdit->toMarkdown());
+    });
+
     webConnector = new WebConnector();
     connect(webConnector, &WebConnector::autoUpdatesUnknown, this, &MainWindow::updateUnknown);
     webConnector->checkUpdates();
@@ -101,7 +157,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::TreeViewDoubleClick(const QModelIndex &index)
 {
-   auto path = model->filePath(index);
+//   auto path = model->filePath(index);
+    QString path = "asd/asd/";
 
    QFile file(path);
 
@@ -177,7 +234,7 @@ QToolBar *MainWindow::createToolbar()
     connect(openDirAction, &QAction::triggered, this, [this]()
     {
         QString path = QFileDialog::getExistingDirectory(this, "Choose Directory",QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-        this->view->setRootIndex(this->model->index(path));
+//        this->view->setRootIndex(this->model->index(path));
 
     });
 

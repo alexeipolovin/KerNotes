@@ -10,7 +10,7 @@
 #include <QTreeView>
 #include "untextedit.h"
 #include "webconnector.h"
-
+#include "libraries/qjsonmodel.h"
 
 #define TYPE_SETTINGS "settings/file_type"
 #define FIRST_STARTUP "settings/first_startup"
@@ -30,8 +30,10 @@ private:
 
     UnTextEdit *textEdit;
 
+    QTextEdit *previewTextEdit;
+
     QTreeView *view;
-    QDirModel *model;
+    QJsonModel *model;
 
     QSettings *settings;
 
@@ -39,6 +41,8 @@ private:
 
     bool saveFile();
     bool openFile();
+
+    bool shown = false;
 
 public:
     MainWindow(QWidget *parent = nullptr);

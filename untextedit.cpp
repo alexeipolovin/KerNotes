@@ -3,6 +3,14 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QDebug>
+#include <QTextDocumentFragment>
+
+#define BOLD_OPEN_HTML "<b>"
+#define BOLD_CLOSE_HTML "</b>"
+
+#define CURS_OPEN_HTML "<i>"
+#define CURS_CLOSE_HTML "</i>"
+
 
 bool UnTextEdit::getIsTextChanged() const
 {
@@ -27,10 +35,6 @@ void UnTextEdit::setTextType(short value)
 QString UnTextEdit::getFileName() const
 {
     return fileName;
-    for(int i = 0l; i < 100l; i++)
-    {
-        qDebug() << "i:" << i;
-    }
 }
 
 void UnTextEdit::setFileName(const QString &value)
@@ -71,6 +75,36 @@ void UnTextEdit::saveFile()
                 qDebug() << "File not saved";
     }
 
+}
+
+
+// Compare in one method
+void UnTextEdit::placeBoldText()
+{
+     auto textCursor = this->textCursor();
+
+     qDebug() << textCursor.selection().toHtml("ISO 8859-1");
+     if(textCursor.hasSelection())
+     {
+         if(this->textType == 1)
+            textCursor.insertHtml(BOLD_OPEN_HTML + textCursor.selectedText() + BOLD_CLOSE_HTML);
+     } else {
+         qDebug() << "No Selection";
+     }
+}
+
+void UnTextEdit::placeCursText()
+{
+    auto textCursor = this->textCursor();
+    if(textCursor.hasSelection())
+    {
+        qDebug() << textCursor.selection().toHtml();
+
+        if(this->textType == 1)
+            textCursor.insertHtml(CURS_OPEN_HTML + textCursor.selectedText() + CURS_CLOSE_HTML);
+    } else {
+        qDebug() << "No selection";
+    }
 }
 
 UnTextEdit::UnTextEdit() : QTextEdit()
