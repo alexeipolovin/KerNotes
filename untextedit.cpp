@@ -72,8 +72,19 @@ void UnTextEdit::saveFile()
             }
             file.close();
         } else {
-                qDebug() << "File not saved";
+        // Why auto md extension? Bug or feature?
+        this->fileName = QFileDialog::getSaveFileName(this, "Choose file name", QDir::currentPath(), "Text Files (*.md *.html *.txt)");
+        QFile file(this->fileName);
+        if(file.open(QIODevice::ReadWrite))
+        {
+            file.write(toMarkdown().toUtf8());
+            this->isTextChanged = false;
+        } else {
+            qDebug() << "File not saved";
+        }
+        file.close();
     }
+    emit fileSaved();
 
 }
 

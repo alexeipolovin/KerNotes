@@ -15,8 +15,8 @@
 
 #define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
 
-#define STANDART_TITLE "* - KerNotes"
-
+#define STANDART_TITLE_EDITED "* - KerNotes"
+#define STANDART_TITLE " - KerNotes"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(textEdit, &UnTextEdit::textChanged, this, [this] ()
     {
        textEdit->setIsTextChanged(true);
-       setWindowTitle(textEdit->getFileName() +STANDART_TITLE);
+       setWindowTitle(textEdit->getFileName() + STANDART_TITLE_EDITED);
        if(!this->shown) {
        if(previewTextEdit->toPlainText().length() > 5000)
        {
@@ -69,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << text;
             if(text == "HTML")
             {
+                QMessageBox::warning(NULL, "Warning", "HTML is currently not supported");
                 textEdit->setTextType(1);
                 settings->setValue(TYPE_SETTINGS, 1);
             } else if(text == "MarkDown")
@@ -119,7 +120,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     mainLayout->addWidget(view);
     mainLayout->addWidget(textEdit);
-    mainLayout->addWidget(previewTextEdit);
+    if(textEdit->getTextType() != 3)
+        mainLayout->addWidget(previewTextEdit);
 
     mainWidget->setLayout(mainLayout);
 
@@ -134,6 +136,9 @@ MainWindow::MainWindow(QWidget *parent)
     auto *saveShortcut = new QShortcut(this);
     saveShortcut->setKey(Qt::CTRL + Qt::Key_S);
     connect(saveShortcut, &QShortcut::activated, textEdit, &UnTextEdit::saveFile);
+    connect(textEdit, &UnTextEdit::fileSaved, this, [this](){
+        setWindowTitle(this->textEdit->getFileName() + STANDART_TITLE);
+    });
 
     auto *boldShortcut = new QShortcut(this);
     boldShortcut->setKey(Qt::CTRL + Qt::Key_B);
@@ -154,11 +159,11 @@ MainWindow::MainWindow(QWidget *parent)
     webConnector->checkUpdates();
 
 }
-
+// TODO: Remove this
 void MainWindow::TreeViewDoubleClick(const QModelIndex &index)
 {
 //   auto path = model->filePath(index);
-    QString path = "asd/asd/";
+   QString path = "asd/asd/";
 
    QFile file(path);
 

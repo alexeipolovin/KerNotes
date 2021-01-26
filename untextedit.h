@@ -29,7 +29,8 @@ public:
 
     QString getFileName() const;
     void setFileName(const QString &value);
-
+signals:
+    void fileSaved();
 public slots:
     void openFile();
     void saveFile();
