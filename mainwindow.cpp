@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     textEdit = new UnTextEdit();
+    textEdit->setTabStopDistance(QFontMetricsF(textEdit->font()).horizontalAdvance(' ') * 4);
     previewTextEdit = new QTextEdit();
     previewTextEdit->setReadOnly(true);
 
@@ -37,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(textEdit, &UnTextEdit::textChanged, this, [this] ()
     {
        textEdit->setIsTextChanged(true);
-       setWindowTitle(textEdit->getFileName() + STANDART_TITLE_EDITED);
+       setWindowTitle(textEdit->getFileName() + STANDART_TITLE);
        if(!this->shown) {
        if(previewTextEdit->toPlainText().length() > 5000)
        {
