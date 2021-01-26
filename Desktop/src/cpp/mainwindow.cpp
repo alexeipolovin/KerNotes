@@ -1,5 +1,5 @@
-#include "mainwindow.h"
-#include "settingswindow.h"
+#include "src/headers/mainwindow.h"
+#include "src/headers/settingswindow.h"
 
 #include <QMenu>
 #include <QToolButton>
@@ -11,7 +11,6 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include "libraries/markdownhighlighter.h"
-#include "libraries/qjsonmodel.h"
 
 #define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
 
@@ -26,9 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
     previewTextEdit = new QTextEdit();
     previewTextEdit->setReadOnly(true);
 
-    auto doc = this->textEdit->document();
-    auto *highliter = new MarkdownHighlighter(doc);
-    qDebug() << highliter;
 
     addToolBar(createToolbar());
 
@@ -37,15 +33,26 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(textEdit, &UnTextEdit::textChanged, this, [this] ()
     {
+        short textType = this->textEdit->getTextType();
        textEdit->setIsTextChanged(true);
-       setWindowTitle(textEdit->getFileName() + STANDART_TITLE);
+       setWindowTitle(textEdit->getFileName() + STANDART_TITLE_EDITED);
+       // TODO: Optimize this
        if(!this->shown) {
        if(previewTextEdit->toPlainText().length() > 5000)
        {
            QMessageBox::warning(nullptr, "Too large file", "Your file is too large, live preview will be disabled");
            this->shown = true;
        } else {
-            this->previewTextEdit->setMarkdown(this->textEdit->toMarkdown());
+           switch (textType) {
+               case 1:
+                   this->previewTextEdit->setHtml(this->textEdit->toHtml());
+                   break;
+               case 2:
+                   this->previewTextEdit->setMarkdown(this->textEdit->toMarkdown());
+                   break;
+               default:
+                   break;
+           }
        }
        }
     });
@@ -70,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << text;
             if(text == "HTML")
             {
-                QMessageBox::warning(NULL, "Warning", "HTML is currently not supported");
+                QMessageBox::warning(nullptr, "Warning", "HTML is currently not supported");
                 textEdit->setTextType(1);
                 settings->setValue(TYPE_SETTINGS, 1);
             } else if(text == "MarkDown")
@@ -86,6 +93,13 @@ MainWindow::MainWindow(QWidget *parent)
         }
     } else {
         textEdit->setTextType(settings->value(TYPE_SETTINGS).toInt());
+    }
+    // TODO: Remove this
+    if(textEdit->getTextType() == 2)
+    {
+        auto doc = this->textEdit->document();
+        auto *highliter = new MarkdownHighlighter(doc);
+        qDebug() << highliter;
     }
     QString json = R"({
                        "firstName": "John",
@@ -110,8 +124,8 @@ MainWindow::MainWindow(QWidget *parent)
                            }
                        ]
                    })";
-    view = new QTreeView;
-    model = new QJsonModel;
+    view = new QTreeView();
+    model = new QJsonModel();
     view->setModel(model);
     model->loadJson(json.toUtf8());
 //    view = new QTreeView;
@@ -151,8 +165,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     auto *previewShortcut = new QShortcut(this);
     previewShortcut->setKey(Qt::CTRL + Qt::Key_P);
-    connect(previewShortcut, &QShortcut::activated, this, [this](){
-        this->previewTextEdit->setMarkdown(textEdit->toMarkdown());
+    connect(previewShortcut, &QShortcut::activated, this, [this]() {
+        switch (this->textEdit->getTextType()) {
+            case 1:
+                this->previewTextEdit->setHtml(textEdit->toHtml());
+            case 2:
+                this->previewTextEdit->setMarkdown(textEdit->toMarkdown());
+                break;
+        }
     });
 
     webConnector = new WebConnector();
@@ -182,6 +202,7 @@ void MainWindow::updateUnknown()
                                     tr("Check updates automatically\n"),
                                     QMessageBox::No | QMessageBox::Yes,
                                     QMessageBox::Yes);
+    QMessageBox::warning(this, "Hello, World", "Suck");
         if(resBtn == QMessageBox::Yes)
         {
             this->settings->setValue(AUTO_UPDATES, true);
@@ -269,5 +290,4 @@ QToolBar *MainWindow::createToolbar()
 }
 
 MainWindow::~MainWindow()
-{
-}
+= default;

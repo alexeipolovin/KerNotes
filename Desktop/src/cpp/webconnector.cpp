@@ -1,4 +1,4 @@
-#include "webconnector.h"
+#include "src/headers/webconnector.h"
 
 #include <QtNetwork/QNetworkReply>
 

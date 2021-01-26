@@ -1,3 +1,4 @@
+set(CMAKE_PREFIX_PATH "E:/Qt/5.15.2/mingw81_64")
 cmake_minimum_required(VERSION 3.5)
 
 project(KerNotes LANGUAGES CXX)
@@ -31,17 +32,17 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Network REQUIRED)
 #find_package(Qt${QT_VERSION_MAJOR} COMPONENTS WebEngineCore REQUIRED)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        webconnector.h
-        webconnector.cpp
-        untextedit.h
-        untextedit.cpp
-        settingswindow.h
-        settingswindow.cpp
-#        qjsonmodel.cpp
-#        qjsonmodel.h
+        src/cpp/main.cpp
+        src/cpp/mainwindow.cpp
+        src/headers/mainwindow.h
+        src/headers/webconnector.h
+        src/cpp/webconnector.cpp
+        src/headers/untextedit.h
+        src/cpp/untextedit.cpp
+        src/headers/settingswindow.h
+        src/cpp/settingswindow.cpp
+        #        qjsonmodel.cpp
+        #        qjsonmodel.h
         res.qrc
         libraries/markdownhighlighter.h
         libraries/qmarkdowntextedit.h
@@ -55,21 +56,21 @@ set(PROJECT_SOURCES
         libraries/qjsonmodel.cpp
         libraries/qjsonmodel.h
 
-)
+        )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(KerNotes
-        ${PROJECT_SOURCES}
-    )
+            ${PROJECT_SOURCES}
+            )
 else()
     if(ANDROID)
         add_library(KerNotes SHARED
-            ${PROJECT_SOURCES}
-        )
+                ${PROJECT_SOURCES}
+                )
     else()
         add_executable(KerNotes
-            ${PROJECT_SOURCES}
-        )
+                ${PROJECT_SOURCES}
+                )
     endif()
 endif()
 

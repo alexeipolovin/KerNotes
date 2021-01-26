@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "src/headers/mainwindow.h"
 
 #include <QApplication>
 #include <QDebug>
@@ -26,15 +26,14 @@ int main(int argc, char *argv[])
     } else {
         qDebug() << settings->value(VERSION).toString();
     }
-//    settings->deleteLater();
 
 
 #ifdef Q_OS_WIN
-    QSettings darkTheme("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",QSettings::NativeFormat);
+    QSettings darkTheme(R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",QSettings::NativeFormat);
     if(darkTheme.value("AppsUseLightTheme")==0)
     {
         qDebug() << "Dark theme enabled";
-        a.setStyle(QStyleFactory::create("Fusion"));
+        QApplication::setStyle(QStyleFactory::create("Fusion"));
     QPalette darkPalette;
     QColor darkColor = QColor(45,45,45);
     QColor disabledColor = QColor(127, 127, 127);
@@ -51,7 +50,7 @@ int main(int argc, char *argv[])
     darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText, disabledColor);
     darkPalette.setColor(QPalette::BrightText, Qt::red);
     darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-    a.setPalette(darkPalette);
+    QApplication::setPalette(darkPalette);
     } else {
         qDebug() << "Light theme enabled";
     }

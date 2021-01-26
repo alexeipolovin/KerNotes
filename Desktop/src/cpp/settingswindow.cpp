@@ -1,4 +1,4 @@
-#include "settingswindow.h"
+#include "src/headers/settingswindow.h"
 
 #include <QLabel>
 
