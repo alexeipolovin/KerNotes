@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QTextDocumentFragment>
+#include <QSettings>
 
 #define BOLD_OPEN_HTML "<b>"
 #define BOLD_CLOSE_HTML "</b>"
@@ -17,6 +18,7 @@
 #define BOLD_OPEN_MARKDOWN "**"
 #define BOLD_CLOSE_MARKDOWN "**"
 
+#define TYPE_SETTINGS "settings/file_type"
 
 
 bool UnTextEdit::getIsTextChanged() const
@@ -37,6 +39,9 @@ short UnTextEdit::getTextType() const
 void UnTextEdit::setTextType(short value)
 {
     this->textType = value;
+    auto settings = new QSettings("Kernux", "KerNotes");
+    settings->setValue(TYPE_SETTINGS, value);
+    delete settings;
 }
 
 QString UnTextEdit::getFileName() const

@@ -144,7 +144,7 @@ void MarkdownHighlighter::initHighlightingRules() {
 
         // highlight urls without any other markup
         rule.pattern =
-            QRegularExpression(QStringLiteral(R"(\b\w+?:\/\/[^\s>]+)"));
+                QRegularExpression(QStringLiteral(R"(\b\w+?:\/\/[^\s>]+)"));
         rule.capturingGroup = 0;
         rule.shouldContain = QStringLiteral("://");
         _highlightingRules.append(rule);

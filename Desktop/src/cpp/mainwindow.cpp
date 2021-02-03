@@ -1,5 +1,7 @@
 #include "src/headers/mainwindow.h"
 #include "src/headers/settingswindow.h"
+#include "libraries/markdownhighliter/markdownhighlighter.h"
+#include "src/headers/JsProvider.h"
 
 #include <QMenu>
 #include <QToolButton>
@@ -10,21 +12,21 @@
 #include <QCloseEvent>
 #include <QInputDialog>
 #include <QMessageBox>
-#include "libraries/markdownhighlighter.h"
 
 #define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
 
 #define STANDART_TITLE_EDITED "* - KerNotes"
 #define STANDART_TITLE " - KerNotes"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-
     textEdit = new UnTextEdit();
     textEdit->setTabStopDistance(QFontMetricsF(textEdit->font()).horizontalAdvance(' ') * 4);
-    previewTextEdit = new QTextEdit();
-    previewTextEdit->setReadOnly(true);
 
+    previewTextEdit = new QTextEdit();
+    previewTextEdit->setContextMenuPolicy(Qt::NoContextMenu);
+    previewTextEdit->setReadOnly(true);
 
     addToolBar(createToolbar());
 
@@ -55,7 +57,11 @@ MainWindow::MainWindow(QWidget *parent)
            }
        }
        }
+
     });
+    JsProvider *jsProvider = new JsProvider();
+    textEdit->setTextType(2);
+    qDebug() << "UnTextEdit textg type:" << textEdit->getTextType();
 
     settings = new QSettings("Kernux", "KerNotes");
 
@@ -128,21 +134,17 @@ MainWindow::MainWindow(QWidget *parent)
     model = new QJsonModel();
     view->setModel(model);
     model->loadJson(json.toUtf8());
-//    view = new QTreeView;
-//    view->setModel(model);
-//    view->setRootIndex(model->index(QDir::currentPath()));
+    // TODO: fix?
     view->setFixedWidth(this->width() * 1/4);
 
     mainLayout->addWidget(view);
     mainLayout->addWidget(textEdit);
-    if(textEdit->getTextType() != 3)
-        mainLayout->addWidget(previewTextEdit);
+    mainLayout->addWidget(previewTextEdit);
 
     mainWidget->setLayout(mainLayout);
 
     setCentralWidget(mainWidget);
-
-    connect(view, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(TreeViewDoubleClick(QModelIndex)));
+    connect(view, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(TreeViewDoubleClick(const QModelIndex &)));
 
     auto *openShortcut = new QShortcut(this);
     openShortcut->setKey(Qt::CTRL + Qt::Key_O);
@@ -247,7 +249,7 @@ QToolBar *MainWindow::createToolbar()
 
     toolBar->setMovable(false);
 
-    auto *fileToolButon = new QToolButton();
+    auto *fileToolButton = new QToolButton();
 
     QMenu *menu = new QMenu();
 
@@ -279,15 +281,15 @@ QToolBar *MainWindow::createToolbar()
     menu->addAction(saveFileAction);
     menu->addAction(openDirAction);
 
-    fileToolButon->setMenu(menu);
-    fileToolButon->setPopupMode(QToolButton::MenuButtonPopup);
-    fileToolButon->setText("File");
+    fileToolButton->setMenu(menu);
+    fileToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+    fileToolButton->setText("File");
 
-    toolBar->addWidget(fileToolButon);
+    toolBar->addWidget(fileToolButton);
     toolBar->addAction(settingsAction);
 
     return toolBar;
 }
-
+// I don't need this for now
 MainWindow::~MainWindow()
 = default;

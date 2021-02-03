@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
     }
 
 
+// windows dark theme checking and enabling
 #ifdef Q_OS_WIN
     QSettings darkTheme(R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",QSettings::NativeFormat);
     if(darkTheme.value("AppsUseLightTheme")==0)
@@ -55,6 +56,10 @@ int main(int argc, char *argv[])
         qDebug() << "Light theme enabled";
     }
 //    darkTheme.deleteLater();
+#endif
+// MacOs dark mode checking and enabling
+#ifdef Q_OS_DARWIN
+// TODO: Write this
 #endif
     w.showMaximized();
     return a.exec();

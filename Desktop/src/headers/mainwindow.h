@@ -8,9 +8,10 @@
 #include <QTextEdit>
 #include <QToolBar>
 #include <QTreeView>
+//#include <QWebEngineView>
 #include "untextedit.h"
 #include "webconnector.h"
-#include "libraries/qjsonmodel.h"
+#include "libraries/qjsontreeview/qjsonmodel.h"
 
 #define TYPE_SETTINGS "settings/file_type"
 #define FIRST_STARTUP "settings/first_startup"
@@ -31,7 +32,7 @@ private:
     UnTextEdit *textEdit;
 
     QTextEdit *previewTextEdit;
-
+//    QWebEnginePage *previewTextEdit;
     QTreeView *view;
     QJsonModel *model;
 
@@ -39,17 +40,14 @@ private:
 
     QString fileName;
 
-    bool saveFile();
-    bool openFile();
-
     bool shown = false;
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void resizeEvent(QResizeEvent *event);
-    void closeEvent(QCloseEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 public slots:
     void updateUnknown();
     void TreeViewDoubleClick(const QModelIndex &index);
