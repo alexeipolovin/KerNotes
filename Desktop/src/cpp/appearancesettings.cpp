@@ -1,6 +1,7 @@
 #include "src/headers/appearancesettings.h"
 #include "src/headers/untextedit.h"
 #include <QDebug>
+#include <QFontDialog>
 AppearanceSettings::AppearanceSettings(QWidget *parent, int index) : QWidget(parent)
 {
     qDebug() << index;
@@ -9,6 +10,7 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index) : QWidget(par
 	checkBox = new QCheckBox("Live Preview");
 	okButtonLayout = new QHBoxLayout();
 	textTypeBox = new QComboBox();
+	QPushButton *fontSelectButton = new QPushButton("Select Font");
 
 	QPushButton *okButton = new QPushButton("Ok");
 	QPushButton *cancelButton = new QPushButton("Cancel");
@@ -32,6 +34,13 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index) : QWidget(par
         this->close();
     });
 
+    connect(fontSelectButton, &QPushButton::clicked, this, [this]()
+    {
+        selectedFont = QFontDialog::getFont(0, this->font());
+        emit newFontSelected();
+    });
+
+
 
 
 	textTypeBox->addItem("HTML");
@@ -47,6 +56,7 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index) : QWidget(par
 	mainLayout->addWidget(lightThemeButton);
 	mainLayout->addWidget(textTypeBox);
 	mainLayout->addWidget(checkBox);
+	mainLayout->addWidget(fontSelectButton);
 	mainLayout->addLayout(okButtonLayout);
     setFixedSize(300, 300);
     setLayout(mainLayout);
@@ -56,6 +66,11 @@ short AppearanceSettings::getTextType() const
 {
 //    qDebug() << "dflskjglk" << this->textType;
     return this->textType + 1;
+}
+
+QFont AppearanceSettings::getNewFont()
+{
+    return this->selectedFont;
 }
 
 AppearanceSettings::~AppearanceSettings() = default;

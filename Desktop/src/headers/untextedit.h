@@ -41,6 +41,7 @@ public slots:
     void placeBoldText();
     void placeCursText();
 
+    void insertImageSnippet();
 };
 
 #endif // UNTEXTEDIT_H

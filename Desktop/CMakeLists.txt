@@ -1,4 +1,5 @@
-set(CMAKE_PREFIX_PATH "E:\\Qt\\5.15.2\\mingw81_64\\lib\\cmake")
+#set(CMAKE_PREFIX_PATH "E:\\Qt\\5.15.2\\mingw81_64\\lib\\cmake")
+set(CMAKE_PREFIX_PATH "/home/rob/Qt/5.15.2/gcc_64/lib/cmake")
 cmake_minimum_required(VERSION 3.5)
 
 project(KerNotes LANGUAGES CXX)

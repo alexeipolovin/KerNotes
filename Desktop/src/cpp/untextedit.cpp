@@ -130,6 +130,14 @@ void UnTextEdit::placeBoldText()
      }
 }
 
+void UnTextEdit::insertImageSnippet()
+{
+    QString imagePath = QFileDialog::getOpenFileName(this, "Choose file name", QDir::currentPath(), "Images (*.png *.jpeg *.jpg *.JPEG *.webp)");
+    this->append("<img src="+imagePath+"></img>");
+//    this->setText(this->toPlainText());
+}
+
+
 void UnTextEdit::placeCursText() {
     auto textCursor = this->textCursor();
     if (textCursor.hasSelection()) {

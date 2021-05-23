@@ -11,6 +11,7 @@
 #include <QCloseEvent>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QFontDialog>
 
 #define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
 
@@ -221,6 +222,9 @@ MainWindow::MainWindow(QWidget *parent)
         setWindowTitle(this->textEdit->getFileName() + STANDART_TITLE);
     });
 
+    auto imageInsertShortcut = new QShortcut(this);
+    imageInsertShortcut->setKey(Qt::CTRL+Qt::Key_N);
+    connect(imageInsertShortcut, &QShortcut::activated, textEdit, &UnTextEdit::insertImageSnippet);
     auto *boldShortcut = new QShortcut(this);
     boldShortcut->setKey(Qt::CTRL + Qt::Key_B);
     connect(boldShortcut, &QShortcut::activated, textEdit, &UnTextEdit::placeBoldText);
@@ -235,10 +239,10 @@ MainWindow::MainWindow(QWidget *parent)
         switch (this->textEdit->getTextType()) {
             case 1:
                 this->previewTextEdit->setHtml(textEdit->toHtml());
-                if(livePreview)
-                {
-                    this->textEdit->setHtml(textEdit->toHtml());
-                }
+//                if(livePreview)
+//                {
+//                    this->textEdit->setHtml(textEdit->toHtml());
+//                }
                 break;
             case 2:
                 if(!livePreview)
@@ -393,12 +397,17 @@ QToolBar *MainWindow::createToolbar()
     connect(changeTextLayoutAction, &QAction::triggered, this, []() {
 
     });
+    QAction *fontTestActon = new QAction("Open Font");
+    connect(fontTestActon, &QAction::triggered, this, [this]()
+    {
+       QFont font = QFontDialog::getFont(0, this->font());
+    });
 
     QAction *settingsAction = new QAction("Settings");
     connect(settingsAction, &QAction::triggered, this, [this]() {
-        SettingsWindow *w = new SettingsWindow(nullptr, this->textEdit->getTextType());
+        AppearanceSettings *w = new AppearanceSettings(nullptr, this->textEdit->getTextType());
         QTextDocument *docum = this->textEdit->document();
-        connect(w, &SettingsWindow::textTypeChanged, this, [this, w,docum](){
+        connect(w, &AppearanceSettings::textTypeChanged, this, [this, w,docum](){
             if(w->getTextType() != this->textEdit->getTextType())
             {
                 qDebug() << "New text type " <<w->getTextType();
@@ -426,8 +435,15 @@ QToolBar *MainWindow::createToolbar()
            this->textEdit->setTextType(w->getTextType());
 
         });
+        connect(w, &AppearanceSettings::newFontSelected, this, [this, w]()
+        {
+            this->setFont(w->getNewFont());
+        });
+
         w->show();
+
     });
+
     menu->addAction(openFileAction);
     menu->addAction(saveFileAction);
     menu->addAction(openDirAction);
@@ -438,6 +454,7 @@ QToolBar *MainWindow::createToolbar()
 
     toolBar->addWidget(fileToolButton);
     toolBar->addAction(settingsAction);
+//    toolBar->addAction(fontTestActon);
 
     return toolBar;
 }

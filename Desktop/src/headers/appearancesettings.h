@@ -15,6 +15,8 @@ public:
 
     explicit AppearanceSettings(QWidget *parent = nullptr, int index = 1);
 
+	QFont selectedFont;
+
     explicit AppearanceSettings(QWidget *parent);
     QVBoxLayout *mainLayout;
     QPushButton *lightThemeButton;
@@ -25,9 +27,11 @@ public:
 	~AppearanceSettings();
 
     short getTextType() const;
+    QFont getNewFont();
 
 	short textType;
 signals:
+    void newFontSelected();
     void lightThemeEnabled();
     void textTypeChanged();
     void darkThemeEnabled();
