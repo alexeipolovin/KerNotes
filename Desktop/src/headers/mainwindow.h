@@ -8,6 +8,8 @@
 #include <QTextEdit>
 #include <QToolBar>
 #include <QTreeView>
+#include <QFileSystemModel>
+#include <libraries/markdownhighliter/markdownhighlighter.h>
 //#include <QWebEngineView>
 #include "untextedit.h"
 #include "webconnector.h"
@@ -34,7 +36,9 @@ private:
     QTextEdit *previewTextEdit;
 //    QWebEnginePage *previewTextEdit;
     QTreeView *view;
-    QJsonModel *model;
+    // QJsonModel *model;
+    // QFileSystemModel *model;
+    QDirModel *model;
 
     QSettings *settings;
 
@@ -43,13 +47,18 @@ private:
     bool shown = false;
 
 public:
+    bool livePreview = false;
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    MarkdownHighlighter *highliter;
+
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void connectAll();
 public slots:
     void updateUnknown();
+
     void TreeViewDoubleClick(const QModelIndex &index);
 };
 #endif // MAINWINDOW_H

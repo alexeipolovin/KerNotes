@@ -12,20 +12,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# QtCreator supports the following variables for Android, which are identical to qmake Android variables.
-# Check https://doc.qt.io/qt/deployment-android.html for more information.
-# They need to be set before the find_package( ...) calls below.
-
-
-#if(ANDROID)
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-#    if (ANDROID_ABI STREQUAL "armeabi-v7a")
-#        set(ANDROID_EXTRA_LIBS
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libcrypto.so
-#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
-#    endif()
-#endif()
-
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
 #set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/app_icon.rc")
 #find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
@@ -34,7 +20,7 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
-#find_package(Qt5WebEngine REQUIRED)
+find_package(Qt5WebSockets REQUIRED)
 #find_package(Qt5WebEngineWidgets REQUIRED)
 #find_package(Qt${QT_VERSION_MAJOR} COMPONENTS WebEngineCore REQUIRED)
 
@@ -48,7 +34,13 @@ set(PROJECT_SOURCES
         src/cpp/untextedit.cpp
         src/headers/settingswindow.h
         src/cpp/settingswindow.cpp
+        src/headers/socketclient.h
+        src/cpp/socketclient.cpp
+        src/headers/uncomplete.h
+        src/cpp/uncomplete.cpp
         src/resources/res.qrc
+        src/headers/appearancesettings.h
+        src/cpp/appearancesettings.cpp
         libraries/markdownhighliter/markdownhighlighter.h
         libraries/markdownhighliter/qmarkdowntextedit.h
         libraries/markdownhighliter/qownlanguagedata.h
@@ -62,7 +54,7 @@ set(PROJECT_SOURCES
         libraries/qjsontreeview/qjsonmodel.h
         libraries/markdownhighliter/qplaintexteditsearchwidget.ui
         libraries/markdownhighliter/ui_qplaintexteditsearchwidget.h
-        src/cpp/JsProvider.cpp src/headers/JsProvider.h)
+        )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(KerNotes

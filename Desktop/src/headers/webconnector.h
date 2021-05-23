@@ -40,6 +40,7 @@ private:
 signals:
     void newVersionAvailable();
     void autoUpdatesUnknown();
+    void newDataReceived();
 };
 
 #endif // WEBCONNECTOR_H

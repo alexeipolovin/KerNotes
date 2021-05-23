@@ -5,6 +5,8 @@
 #include <QDebug>
 #include <QTextDocumentFragment>
 #include <QSettings>
+#include <QKeyEvent>
+#include <src/headers/appearancesettings.h>
 
 #define BOLD_OPEN_HTML "<b>"
 #define BOLD_CLOSE_HTML "</b>"
@@ -56,11 +58,14 @@ void UnTextEdit::setFileName(const QString &value)
 
 void UnTextEdit::openFile()
 {
+   QSettings *settings = new QSettings("Kernux", "KerNotes");
     this->fileName = QFileDialog::getOpenFileName(this, "Open File", QDir::currentPath(), "Text Files (*.md *.html *.txt)");
     if(this->fileName == "")
     {
         qDebug() << "File path clear!";
     } else {
+        qDebug() << fileName;
+        settings->setValue("lasteditedfile", fileName);
         qDebug() << "File path is not clear";
         QFile file(this->fileName);
         if(file.open(QIODevice::ReadOnly))
@@ -97,6 +102,7 @@ void UnTextEdit::saveFile()
         file.close();
     }
     emit fileSaved();
+    
 
 }
 
@@ -140,6 +146,19 @@ void UnTextEdit::placeCursText() {
         }
     }
 }
+void UnTextEdit::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Return)
+    {
+        emit updateTextEdit();
+        QTextEdit::keyPressEvent(event);
+
+    }
+    else
+    {
+        QTextEdit::keyPressEvent(event);
+    }
+}
 
 UnTextEdit::UnTextEdit() : QTextEdit()
 {
@@ -149,4 +168,12 @@ UnTextEdit::UnTextEdit() : QTextEdit()
 
 UnTextEdit::~UnTextEdit(){
     free(&textType);
+}
+
+void UnTextEdit::openLastFile(QString filePath)
+{
+    QFile file(filePath);
+    if(file.open(QIODevice::ReadOnly))
+        setText(file.readAll());
+    file.close();
 }

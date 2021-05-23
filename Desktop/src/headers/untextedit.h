@@ -17,6 +17,7 @@ private:
 
     QString fileName;
 public:
+    void openLastFile(QString filePath);
     UnTextEdit();
     ~UnTextEdit();
 
@@ -29,14 +30,17 @@ public:
 
     QString getFileName() const;
     void setFileName(const QString &value);
+    void keyPressEvent(QKeyEvent *event);
 signals:
     void fileSaved();
+    void updateTextEdit();
 public slots:
     void openFile();
     void saveFile();
 
     void placeBoldText();
     void placeCursText();
+
 };
 
 #endif // UNTEXTEDIT_H

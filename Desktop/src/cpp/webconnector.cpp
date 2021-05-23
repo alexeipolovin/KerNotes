@@ -27,7 +27,6 @@ void WebConnector::checkUpdates()
             sendRequest(request, CHECK_SELF_UPDATES);
         }
     } else {
-        // Try something different
         qDebug() << "Unknown state";
         qDebug() << settings->value(AUTO_UPDATES).toString();
         emit autoUpdatesUnknown();
@@ -62,9 +61,10 @@ QJsonObject WebConnector::parseReply(QNetworkReply *reply, WebConnector::REQUEST
         }
       break;
    }
-   case CHECK_DATA_UPDATES: {
-       // What the fuck?
-        break;
+   case CHECK_DATA_UPDATES:
+   {
+       QString text = root.find("text").value().toString();
+        emit newDataReceived();
    }
    default:
        break;
@@ -79,7 +79,6 @@ void WebConnector::sendRequest(QNetworkRequest *request, WebConnector::REQUEST_T
         case CHECK_SELF_UPDATES:
         {
             QNetworkReply *reply = manager->get(*request);
-            // от безжалостных уличных драмм
             connect(reply, &QNetworkReply::finished,this, [this, reply, type]() {
                QJsonObject doc = parseReply(reply, type);
             });
