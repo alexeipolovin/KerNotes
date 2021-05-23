@@ -32,15 +32,16 @@ public:
     void setFileName(const QString &value);
     void keyPressEvent(QKeyEvent *event);
 signals:
+    void clearTitle();
     void fileSaved();
     void updateTextEdit();
 public slots:
     void openFile();
     void saveFile();
+    void newFile();
 
     void placeBoldText();
     void placeCursText();
-
     void insertImageSnippet();
 };
 

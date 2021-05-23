@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QKeyEvent>
 #include <src/headers/appearancesettings.h>
+#include <QMessageBox>
 
 #define BOLD_OPEN_HTML "<b>"
 #define BOLD_CLOSE_HTML "</b>"
@@ -106,8 +107,6 @@ void UnTextEdit::saveFile()
 
 }
 
-
-// TODO: Compare curs and bold in one method
 void UnTextEdit::placeBoldText()
 {
      auto textCursor = this->textCursor();
@@ -126,7 +125,18 @@ void UnTextEdit::placeBoldText()
                  qDebug() << "No selection";
          }
      } else {
-         qDebug() << "No selection";
+         switch (textType) {
+             case 1:
+//                 append("<b> </b>");
+//                 append(BOLD_CLOSE_HTML);
+                 break;
+             case 2:
+                 append("****");
+//                 append(BOLD_CLOSE_MARKDOWN);
+                 break;
+             default:
+                 break;
+         }
      }
 }
 
@@ -149,8 +159,22 @@ void UnTextEdit::placeCursText() {
                 break;
             case 2:
                 textCursor.insertText(CURS_OPEN_MARKDOWN + textCursor.selectedText() + CURS_CLOSE_MARKDOWN);
+                break;
             default:
                 qDebug() << "No selection";
+        }
+    } else {
+        switch (textType) {
+            case 1:
+//                append("<i> </i>");
+//                append(CURS_CLOSE_HTML);
+                break;
+            case 2:
+                append("**");
+//                append(CURS_CLOSE_MARKDOWN);
+                break;
+            default:
+                break;
         }
     }
 }
@@ -171,6 +195,33 @@ void UnTextEdit::keyPressEvent(QKeyEvent *event)
 UnTextEdit::UnTextEdit() : QTextEdit()
 {
     QTextEdit();
+}
+
+
+void UnTextEdit::newFile()
+{
+    if(this->getIsTextChanged()) {
+        QMessageBox::StandardButton resBtn = QMessageBox::question( this, "KerNotes",
+                                                                    tr("Are you sure?\n"),
+                                                                    QMessageBox::No | QMessageBox::Save  | QMessageBox::Yes,
+                                                                    QMessageBox::Yes);
+        if (resBtn == QMessageBox::No)
+        {
+
+        } else if(resBtn == QMessageBox::Yes){
+            setText("");
+            setFileName("");
+//            setIsTextChanged(false);
+            emit clearTitle();
+        } else {
+            this->saveFile();
+//            setIsTextChanged(false);
+        }
+    } else {
+        setFileName("");
+        setText("");
+        emit clearTitle();
+    }
 }
 
 

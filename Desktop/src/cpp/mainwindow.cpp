@@ -376,6 +376,7 @@ QToolBar *MainWindow::createToolbar()
     toolBar->setMovable(false);
 
     auto *fileToolButton = new QToolButton();
+    auto textWorkerButton = new QToolButton();
 
     QMenu *menu = new QMenu();
 
@@ -391,7 +392,17 @@ QToolBar *MainWindow::createToolbar()
        QString path = QFileDialog::getExistingDirectory(this, "Choose Directory",QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
        this->view->setRootIndex(this->model->index(path));
 
-    });                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+    });
+
+    auto boldAction = new QAction("Make text bold");
+    connect(boldAction, &QAction::triggered, textEdit, &UnTextEdit::placeBoldText);
+
+    auto cursAction = new QAction("Make text cursive");
+    connect(cursAction, &QAction::triggered, textEdit, &UnTextEdit::placeCursText);
+
+    auto imageAction = new QAction("Insert image");
+    connect(imageAction, &QAction::triggered, textEdit, &UnTextEdit::insertImageSnippet);
+    QMenu *makeTextMenu = new QMenu();
 
     QAction *changeTextLayoutAction = new QAction("Change text layout");
     connect(changeTextLayoutAction, &QAction::triggered, this, []() {
@@ -402,6 +413,7 @@ QToolBar *MainWindow::createToolbar()
     {
        QFont font = QFontDialog::getFont(0, this->font());
     });
+
 
     QAction *settingsAction = new QAction("Settings");
     connect(settingsAction, &QAction::triggered, this, [this]() {
@@ -448,11 +460,26 @@ QToolBar *MainWindow::createToolbar()
     menu->addAction(saveFileAction);
     menu->addAction(openDirAction);
 
+    makeTextMenu->addAction(boldAction);
+    makeTextMenu->addAction(cursAction);
+    makeTextMenu->addAction(imageAction);
+
     fileToolButton->setMenu(menu);
     fileToolButton->setPopupMode(QToolButton::MenuButtonPopup);
     fileToolButton->setText("File");
+    connect(fileToolButton, &QToolButton::clicked, textEdit, &UnTextEdit::newFile);
+
+    connect(textEdit, &UnTextEdit::clearTitle, this, [this]()
+    {
+        setWindowTitle("");
+    });
+
+    textWorkerButton->setMenu(makeTextMenu);
+    textWorkerButton->setPopupMode(QToolButton::InstantPopup);
+    textWorkerButton->setText("Text Worker");
 
     toolBar->addWidget(fileToolButton);
+    toolBar->addWidget(textWorkerButton);
     toolBar->addAction(settingsAction);
 //    toolBar->addAction(fontTestActon);
 
