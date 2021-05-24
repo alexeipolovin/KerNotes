@@ -56,7 +56,7 @@ private:
     UnTextEdit *textEdit;
 
     QTextEdit *previewTextEdit;
-//    QWebEnginePage *previewTextEdit;
+    // QWebEnginePage *previewTextEdit;
     QTreeView *view;
     // QJsonModel *model;
     // QFileSystemModel *model;

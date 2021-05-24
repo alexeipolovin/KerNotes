@@ -25,6 +25,12 @@
 #include <QObject>
 #include <QTextEdit>
 
+/**
+ * @brief UnTextEdit
+ * @author Alexei Polovin
+ * Класс, отвечающий за редактирование текста
+ * */
+
 class UnTextEdit : public QTextEdit
 {
     Q_OBJECT
@@ -41,6 +47,13 @@ private:
 
     bool checkFileName(QStringList &fileNameList) const;
 public:
+    //TODO: Move to enum from short
+    enum TextType
+    {
+        HTML,
+        Markdown,
+        Txt
+    };
     void openLastFile(const QString& filePath);
     UnTextEdit();
     ~UnTextEdit() override;

@@ -13,7 +13,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -201,9 +201,9 @@ MainWindow::MainWindow(QWidget *parent)
 
         qDebug() << highliter;
     }
-    QString json = R"({
-"name":"John", "age":31, "city":"New York"
-                   })";
+//    QString json = R"({
+//"name":"John", "age":31, "city":"New York"
+//                   })";
     view = new QTreeView();
     // model = new QJsonModel();
     model = new QDirModel();
@@ -414,15 +414,15 @@ QToolBar *MainWindow::createToolbar()
     auto *fileToolButton = new QToolButton();
     auto textWorkerButton = new QToolButton();
 
-    QMenu *menu = new QMenu();
+    auto *menu = new QMenu();
 
-    QAction *openFileAction = new QAction("Open file");
+    auto *openFileAction = new QAction("Open file");
     connect(openFileAction, &QAction::triggered, this->textEdit, &UnTextEdit::openFile);
 
-    QAction *saveFileAction = new QAction("Save file");
+    auto *saveFileAction = new QAction("Save file");
     connect(saveFileAction, &QAction::triggered, this->textEdit, &UnTextEdit::saveFile);
 
-    QAction *openDirAction = new QAction("Open folder");
+    auto *openDirAction = new QAction("Open folder");
     connect(openDirAction, &QAction::triggered, this, [this]()
     {
        QString path = QFileDialog::getExistingDirectory(this, "Choose Directory",QDir::currentPath(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
@@ -438,20 +438,20 @@ QToolBar *MainWindow::createToolbar()
 
     auto imageAction = new QAction("Insert image");
     connect(imageAction, &QAction::triggered, textEdit, &UnTextEdit::insertImageSnippet);
-    QMenu *makeTextMenu = new QMenu();
+    auto *makeTextMenu = new QMenu();
 
-    QAction *changeTextLayoutAction = new QAction("Change text layout");
+    auto *changeTextLayoutAction = new QAction("Change text layout");
     connect(changeTextLayoutAction, &QAction::triggered, this, []() {
 
     });
-    QAction *fontTestActon = new QAction("Open Font");
-    connect(fontTestActon, &QAction::triggered, this, [this]()
+    auto *fontTestActon = new QAction("Open Font");
+    connect(fontTestActon, &QAction::triggered, this, []()
     {
-       QFont font = QFontDialog::getFont(0, this->font());
+//       auto font = QFontDialog::getFont(0, this->font());
     });
 
 
-    QAction *settingsAction = new QAction("Settings");
+    auto *settingsAction = new QAction("Settings");
     connect(settingsAction, &QAction::triggered, this, [this]() {
         auto *w = new AppearanceSettings(nullptr, this->textEdit->getTextType(), lightTheme);
         QTextDocument *docum = this->textEdit->document();
@@ -462,7 +462,7 @@ QToolBar *MainWindow::createToolbar()
                 switch (w->getTextType())
                 {
                     case 1:
-                        disconnect(textEdit, &UnTextEdit::textChanged, 0, 0);
+                        disconnect(textEdit, &UnTextEdit::textChanged, nullptr, nullptr);
                         this->connectAll();
                         if(this->textEdit->getTextType() == 2)
                         {
@@ -483,12 +483,12 @@ QToolBar *MainWindow::createToolbar()
            this->textEdit->setTextType(w->getTextType());
 
         });
-        connect(w, &AppearanceSettings::lightThemeEnabled, this, [this, w]{
+        connect(w, &AppearanceSettings::lightThemeEnabled, this, [this]{
             qDebug() << "LIGHT THEME ALERT";
             QApplication::setPalette(this->style()->standardPalette());
             this->lightTheme = true;
         });
-        connect(w, &AppearanceSettings::darkThemeEnabled, this, [this, w]{
+        connect(w, &AppearanceSettings::darkThemeEnabled, this, [this]{
             QPalette darkPalette;
             QColor darkColor = QColor(45,45,45);
             QColor disabledColor = QColor(127, 127, 127);
@@ -547,7 +547,4 @@ QToolBar *MainWindow::createToolbar()
     return toolBar;
 }
 
-MainWindow::~MainWindow()
-{
-    settings->setValue("lasteditedfile", this->textEdit->getFileName());
-}
+MainWindow::~MainWindow() = default;

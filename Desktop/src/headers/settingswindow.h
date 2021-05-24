@@ -44,7 +44,7 @@ public:
     AppearanceSettings *appearanceSettings;
     explicit SettingsWindow(QWidget *parent= nullptr, int index = 1);
     explicit SettingsWindow(QWidget *parent = nullptr);
-    short getTextType();
+    inline short getTextType();
     ~SettingsWindow();
 
 public slots:
