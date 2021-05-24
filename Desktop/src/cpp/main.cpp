@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "-Wclazy-qt-macros"
 #include "src/headers/mainwindow.h"
 
 #include <QApplication>
@@ -8,6 +10,11 @@
 #define STANDART_VERSION "1"
 #define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
 #define VERSION "VERSION"
+#include <qglobal.h>
+#include <QObject>
+#ifdef Q_OS_MAC
+#define сделать тёмную тему
+#endif
 
 
 int main(int argc, char *argv[])
@@ -18,7 +25,7 @@ int main(int argc, char *argv[])
     // icon made by https://freeicons.io/profile/823 (Muhammad Haq)
     w.setWindowIcon(QIcon(":/icons/favicon.png"));
     // TODO: Rewrite to INI format for Linux, or create macro and fix it
-    QSettings *settings = new QSettings("Kernux", "KerNotes");
+    auto *settings = new QSettings("Kernux", "KerNotes");
     if (settings->value(VERSION).toString() == "")
     {
         qDebug() << "Version";
@@ -28,8 +35,7 @@ int main(int argc, char *argv[])
         qDebug() << settings->value(VERSION).toString();
     }
 
-
-// windows dark theme checking and enabling
+// windows dark theme
 #ifdef Q_OS_WIN
     QSettings darkTheme(R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",QSettings::NativeFormat);
     if(darkTheme.value("AppsUseLightTheme")==0)
@@ -74,7 +80,6 @@ int main(int argc, char *argv[])
     } else {
         qDebug() << "Light theme enabled";
     }
-//    darkTheme.deleteLater();
 #endif
 #ifdef Q_OS_LINUX
     QSettings darkTheme(R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",QSettings::NativeFormat);
@@ -126,5 +131,7 @@ int main(int argc, char *argv[])
 //    connect()
 //    darkTheme.deleteLater();
     w.showMaximized();
-    return a.exec();
+    return QApplication::exec();
 }
+
+#pragma clang diagnostic pop

@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/icons">
         <file>favicon.png</file>
+        <file>settings.png</file>
     </qresource>
     <qresource prefix="web">
         <file>index.html</file>

@@ -56,7 +56,11 @@ public:
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
     void connectAll();
+    bool lightTheme;
+signals:
+    void lightThemeEnabled();
 public slots:
+
     void updateUnknown();
 
     void TreeViewDoubleClick(const QModelIndex &index);

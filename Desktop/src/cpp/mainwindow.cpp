@@ -1,3 +1,8 @@
+/**
+ * @author Alexei Polovin
+ *
+ * */
+
 #include "src/headers/mainwindow.h"
 #include "src/headers/settingswindow.h"
 #include "libraries/markdownhighliter/markdownhighlighter.h"
@@ -12,6 +17,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QFontDialog>
+#include <QStyleFactory>
+#include <QApplication>
 
 #define AUTO_UPDATES "AUTO_UPDATES_AVAILABLE"
 
@@ -70,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << text;
         if(text == "HTML")
         {
-            QMessageBox::warning(nullptr, "Warning", "HTML is supported but not actively tested");
+            QMessageBox::warning(nullptr, "Warning", "HTML is in beta");
             textEdit->setTextType(1);
             settings->setValue(TYPE_SETTINGS, 1);
         } else if(text == "MarkDown")
@@ -199,13 +206,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(testButton, &QPushButton::clicked, this, [this](){
         delete highliter;
     });
-    mainLayout->addWidget(testButton);
+//    mainLayout->addWidget(testButton);
     mainWidget->setLayout(mainLayout);
 
     setCentralWidget(mainWidget);
     connect(view, SIGNAL(doubleClicked(const QModelIndex)), this, SLOT(TreeViewDoubleClick(const QModelIndex &)));
 
-    auto updateShortcut = new QShortcut(this);
+//    auto updateShortcut = new QShortcut(this);
 //    updateShortcut->setKey(Qt::Key_Enter);
 //    connect(updateShortcut, &QShortcut::activated, this, [this] (){
 //       emit textEdit->textChanged();
@@ -214,6 +221,10 @@ MainWindow::MainWindow(QWidget *parent)
     auto *openShortcut = new QShortcut(this);
     openShortcut->setKey(Qt::CTRL + Qt::Key_O);
     connect(openShortcut, &QShortcut::activated, textEdit, &UnTextEdit::openFile);
+
+    auto *increaseFontSize = new QShortcut(this);
+    increaseFontSize->setKey(Qt::CTRL+Qt::Key_Minus);
+    connect(increaseFontSize, &QShortcut::activated,textEdit,&UnTextEdit::increaseFontSize);
 
     auto *saveShortcut = new QShortcut(this);
     saveShortcut->setKey(Qt::CTRL + Qt::Key_S);
@@ -266,6 +277,14 @@ MainWindow::MainWindow(QWidget *parent)
         textEdit->setFileName(settings->value("lasteditedfile").toString());
         setWindowTitle(textEdit->getFileName() + STANDART_TITLE_EDITED);
     }
+    connect(textEdit, &UnTextEdit::openSettingsEvent, this, [this]()
+    {
+       auto w = new AppearanceSettings(nullptr, textEdit->getTextType());
+       w->show();
+    });
+    QSettings darkTheme(R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",QSettings::NativeFormat);
+
+    this->lightTheme = !(darkTheme.value("AppsUseLightTheme") == 0);
 }
 // TODO: Remove this
 void MainWindow::TreeViewDoubleClick(const QModelIndex &index)
@@ -417,7 +436,7 @@ QToolBar *MainWindow::createToolbar()
 
     QAction *settingsAction = new QAction("Settings");
     connect(settingsAction, &QAction::triggered, this, [this]() {
-        AppearanceSettings *w = new AppearanceSettings(nullptr, this->textEdit->getTextType());
+        auto *w = new AppearanceSettings(nullptr, this->textEdit->getTextType(), lightTheme);
         QTextDocument *docum = this->textEdit->document();
         connect(w, &AppearanceSettings::textTypeChanged, this, [this, w,docum](){
             if(w->getTextType() != this->textEdit->getTextType())
@@ -446,6 +465,31 @@ QToolBar *MainWindow::createToolbar()
             }
            this->textEdit->setTextType(w->getTextType());
 
+        });
+        connect(w, &AppearanceSettings::lightThemeEnabled, this, [this, w]{
+            qDebug() << "LIGHT THEME ALERT";
+            QApplication::setPalette(this->style()->standardPalette());
+            this->lightTheme = true;
+        });
+        connect(w, &AppearanceSettings::darkThemeEnabled, this, [this, w]{
+            QPalette darkPalette;
+            QColor darkColor = QColor(45,45,45);
+            QColor disabledColor = QColor(127, 127, 127);
+            darkPalette.setColor(QPalette::Window, darkColor);
+            darkPalette.setColor(QPalette::WindowText, Qt::white);
+            darkPalette.setColor(QPalette::Base, QColor(18,18,18));
+            darkPalette.setColor(QPalette::AlternateBase, darkColor);
+            darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
+            darkPalette.setColor(QPalette::ToolTipText, Qt::white);
+            darkPalette.setColor(QPalette::Text, Qt::white);
+            darkPalette.setColor(QPalette::Disabled, QPalette::Text, disabledColor);
+            darkPalette.setColor(QPalette::Button, darkColor);
+            darkPalette.setColor(QPalette::ButtonText, Qt::white);
+            darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText, disabledColor);
+            darkPalette.setColor(QPalette::BrightText, Qt::red);
+            darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
+            QApplication::setPalette(darkPalette);
+            this->lightTheme = false;
         });
         connect(w, &AppearanceSettings::newFontSelected, this, [this, w]()
         {

@@ -11,10 +11,10 @@
 
 #define BOLD_OPEN_HTML "<b>"
 #define BOLD_CLOSE_HTML "</b>"
-//TODO: Add some defines for markdown
+
 #define CURS_OPEN_HTML "<i>"
 #define CURS_CLOSE_HTML "</i>"
-//TODO: refactor this
+
 #define CURS_OPEN_MARKDOWN "*"
 #define CURS_CLOSE_MARKDOWN "*"
 
@@ -57,10 +57,37 @@ void UnTextEdit::setFileName(const QString &value)
     this->fileName = value;
 }
 
+bool UnTextEdit::checkFileName(QStringList &fileNameList) const
+{
+    bool isOk = true;
+    QString extension = fileNameList[fileNameList.length() - 1].split(".").back();
+    qDebug() << "Extension:" << extension;
+    int extensionType = 0;
+    if(extension == "html")
+    {
+        extensionType = 1;
+    } else if(extension == "md")
+    {
+        extensionType = 2;
+    } else {
+        extensionType = 3;
+    }
+    if(extensionType != textType)
+    {
+        QMessageBox::warning(nullptr, "Расширение не совпадает", "Расширение открытого вами файла не совпадает с выбранным ранее, для изменения перейдите в настройки");
+//        emit openSettingsEvent();
+        isOk = false;
+    }
+    return isOk;
+}
+
 void UnTextEdit::openFile()
 {
    QSettings *settings = new QSettings("Kernux", "KerNotes");
     this->fileName = QFileDialog::getOpenFileName(this, "Open File", QDir::currentPath(), "Text Files (*.md *.html *.txt)");
+    qDebug() << "Filename:" << fileName;
+    auto splittedFile = fileName.split("/");
+    checkFileName(splittedFile);
     if(this->fileName == "")
     {
         qDebug() << "File path clear!";
@@ -143,6 +170,10 @@ void UnTextEdit::placeBoldText()
 void UnTextEdit::insertImageSnippet()
 {
     QString imagePath = QFileDialog::getOpenFileName(this, "Choose file name", QDir::currentPath(), "Images (*.png *.jpeg *.jpg *.JPEG *.webp)");
+    if(imagePath == "")
+    {
+        QMessageBox::warning(nullptr, "Изображение не выбрано", "Будет вставлена заглушка");
+    }
     this->append("<img src="+imagePath+"></img>");
 //    this->setText(this->toPlainText());
 }
@@ -224,12 +255,17 @@ void UnTextEdit::newFile()
     }
 }
 
+void UnTextEdit::increaseFontSize()
+{
+    qDebug() << fontPointSize();
+    setFontPointSize(fontPointSize() + 10);
+}
 
 UnTextEdit::~UnTextEdit(){
     free(&textType);
 }
 
-void UnTextEdit::openLastFile(QString filePath)
+void UnTextEdit::openLastFile(const QString& filePath)
 {
     QFile file(filePath);
     if(file.open(QIODevice::ReadOnly))

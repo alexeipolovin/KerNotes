@@ -2,12 +2,15 @@
 #include "src/headers/untextedit.h"
 #include <QDebug>
 #include <QFontDialog>
-AppearanceSettings::AppearanceSettings(QWidget *parent, int index) : QWidget(parent)
+
+// Icon from https://freeicons.io/social-media/icons-settings-icon-9616
+AppearanceSettings::AppearanceSettings(QWidget *parent, int index, bool lightTheme) : QWidget(parent)
 {
     qDebug() << index;
 	mainLayout = new QVBoxLayout();
 	lightThemeButton = new QPushButton("Light Theme");
-	checkBox = new QCheckBox("Live Preview");
+	checkBox = new QCheckBox("Light Theme");
+	checkBox->setChecked(lightTheme);
 	okButtonLayout = new QHBoxLayout();
 	textTypeBox = new QComboBox();
 	QPushButton *fontSelectButton = new QPushButton("Select Font");
@@ -22,6 +25,7 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index) : QWidget(par
         emit textTypeChanged();
         if(this->checkBox->isChecked())
         {
+            qDebug() << "LIGHT THEME ALERT";
             emit lightThemeEnabled();
         } else {
             emit darkThemeEnabled();
@@ -40,7 +44,8 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index) : QWidget(par
         emit newFontSelected();
     });
 
-
+    setWindowIcon(QIcon(":/icons/settings.png"));
+    setWindowTitle("Settings");
 
 
 	textTypeBox->addItem("HTML");

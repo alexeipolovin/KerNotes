@@ -13,7 +13,7 @@ class AppearanceSettings: public QWidget
 public:
 
 
-    explicit AppearanceSettings(QWidget *parent = nullptr, int index = 1);
+    explicit AppearanceSettings(QWidget *parent = nullptr, int index = 1, bool lightTheme = false);
 
 	QFont selectedFont;
 
