@@ -52,6 +52,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    systemTrayIcon = new QSystemTrayIcon();
+    socketClient = new SocketClient();
     textEdit = new UnTextEdit();
     textEdit->setTabStopDistance(QFontMetricsF(textEdit->font()).horizontalAdvance(' ') * 4);
 
@@ -302,6 +304,34 @@ MainWindow::MainWindow(QWidget *parent)
     QSettings darkTheme(R"(HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)",QSettings::NativeFormat);
 
     this->lightTheme = !(darkTheme.value("AppsUseLightTheme") == 0);
+
+    connect(socketClient, &SocketClient::newNoteReceived, this, [this]()
+    {
+        if(QDir(QDir::currentPath() + "/Sync").exists())
+        {
+            QFile file(QDir::currentPath() + "/Sync/" + socketClient->getFilePath());
+            if(file.open(QFile::ReadWrite))
+            {
+                file.write(socketClient->getNoteText().toUtf8());
+                qDebug() << "New note received";
+                systemTrayIcon->showMessage("New note received", socketClient->getFilePath(), QIcon(":/images/favicon.png"), 15000);
+            } else {
+                systemTrayIcon->showMessage("Sync error", socketClient->getFilePath(), QIcon(":/images/favicon.png"), 15000);
+                qDebug() << "Eroor while sync";
+            }
+        } else {
+            QDir().mkdir(QDir::currentPath() + "/Sync");
+            QFile file(QDir::currentPath() + "/Sync/" + socketClient->getFilePath());
+            if(file.open(QFile::ReadWrite))
+            {
+                file.write(socketClient->getNoteText().toUtf8());
+                qDebug() << "New note received";
+            } else {
+                qDebug() << "Eroor while sync";
+            }
+        }
+    });
+
 }
 // TODO: Remove this
 void MainWindow::TreeViewDoubleClick(const QModelIndex &index)
@@ -450,12 +480,39 @@ QToolBar *MainWindow::createToolbar()
 //       auto font = QFontDialog::getFont(0, this->font());
     });
 
+    auto syncAction = new QAction("Sync");
+    connect(syncAction, &QAction::triggered, this, [this]()
+    {
+        QJsonObject data;
+        data.insert("file", QJsonValue::fromVariant(textEdit->getFileName()));
+        switch (textEdit->getTextType()) {
+            case 1:
+                data.insert("text", QJsonValue::fromVariant(textEdit->toHtml()));
+                break;
+            case 2:
+                data.insert("text", QJsonValue::fromVariant(textEdit->toMarkdown()));
+                break;
+            default:
+                data.insert("text", QJsonValue::fromVariant(textEdit->toPlainText()));
+        }
+
+        QJsonDocument doc(data);
+        if(syncType == "Text")
+        {
+            socketClient->syncNotes(doc.toJson());
+        } else {
+            socketClient->syncNotes(QString(doc.toJson()));
+        }
+
+
+    });
+
 
     auto *settingsAction = new QAction("Settings");
     connect(settingsAction, &QAction::triggered, this, [this]() {
-        auto *w = new AppearanceSettings(nullptr, this->textEdit->getTextType(), lightTheme);
+       w = new AppearanceSettings(nullptr, this->textEdit->getTextType(), lightTheme, syncType, "ws://localhost:12345");
         QTextDocument *docum = this->textEdit->document();
-        connect(w, &AppearanceSettings::textTypeChanged, this, [this, w,docum](){
+        connect(w, &AppearanceSettings::textTypeChanged, this, [this, docum](){
             if(w->getTextType() != this->textEdit->getTextType())
             {
                 qDebug() << "New text type " <<w->getTextType();
@@ -483,6 +540,16 @@ QToolBar *MainWindow::createToolbar()
            this->textEdit->setTextType(w->getTextType());
 
         });
+
+        connect(w, &AppearanceSettings::newSyncType, this, [this]()
+        {
+            syncType = w->getSyncType();
+        });
+        connect(w, &AppearanceSettings::newUrl, this, [this]()
+        {
+            socketClient->setUrl(w->getUrl());
+        });
+
         connect(w, &AppearanceSettings::lightThemeEnabled, this, [this]{
             qDebug() << "LIGHT THEME ALERT";
             QApplication::setPalette(this->style()->standardPalette());
@@ -508,7 +575,7 @@ QToolBar *MainWindow::createToolbar()
             QApplication::setPalette(darkPalette);
             this->lightTheme = false;
         });
-        connect(w, &AppearanceSettings::newFontSelected, this, [this, w]()
+        connect(w, &AppearanceSettings::newFontSelected, this, [this]()
         {
             this->setFont(w->getNewFont());
         });

@@ -24,15 +24,39 @@
 #include "src/headers/untextedit.h"
 #include <QDebug>
 #include <QFontDialog>
+#include <QLineEdit>
+#include <QLabel>
 
 // Icon from https://freeicons.io/social-media/icons-settings-icon-9616
-AppearanceSettings::AppearanceSettings(QWidget *parent, int index, bool lightTheme) : QWidget(parent)
+AppearanceSettings::AppearanceSettings(QWidget *parent, int index, bool lightTheme, QString syncType, QString url) : QWidget(parent)
 {
+
     qDebug() << index;
 	mainLayout = new QVBoxLayout();
 	lightThemeButton = new QPushButton("Light Theme");
 	checkBox = new QCheckBox("Light Theme");
 	checkBox->setChecked(lightTheme);
+	auto syncTypeCheckBox = new QCheckBox("String sync");
+	auto urlLabel = new QLabel("Url:");
+	auto lineEditLay = new QHBoxLayout();
+	auto input = new QLineEdit();
+    this->syncType = syncType;
+
+    input->setText(url);
+
+    qDebug() << syncType;
+
+    if(syncType == "Binary")
+    {
+        syncTypeCheckBox->setChecked(false);
+    } else {
+        syncTypeCheckBox->setChecked(true);
+    }
+
+
+	lineEditLay->addWidget(urlLabel);
+	lineEditLay->addWidget(input);
+
 	okButtonLayout = new QHBoxLayout();
 	textTypeBox = new QComboBox();
 	QPushButton *fontSelectButton = new QPushButton("Select Font");
@@ -40,7 +64,7 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index, bool lightThe
 	QPushButton *okButton = new QPushButton("Ok");
 	QPushButton *cancelButton = new QPushButton("Cancel");
 
-    connect(okButton, &QPushButton::clicked, this, [this](){
+    connect(okButton, &QPushButton::clicked, this, [this, syncTypeCheckBox, input, url](){
 	    this->textType = (short) this->textTypeBox->currentIndex();
 	    qDebug() << "Selected index" << this->textTypeBox->currentIndex();
 	    qDebug() << "Current text" << this->textTypeBox->currentText();
@@ -51,6 +75,21 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index, bool lightThe
             emit lightThemeEnabled();
         } else {
             emit darkThemeEnabled();
+        }
+
+        if(syncTypeCheckBox->isChecked())
+        {
+            this->syncType = "Text";
+            emit newSyncType();
+        } else {
+            this->syncType = "Binary";
+            emit newSyncType();
+        }
+
+        if(input->text() != url)
+        {
+            this->mbUrl = input->text();
+            emit newUrl();
         }
         this->close();
 	});
@@ -80,10 +119,12 @@ AppearanceSettings::AppearanceSettings(QWidget *parent, int index, bool lightThe
 	okButtonLayout->addWidget(cancelButton);
     okButtonLayout->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
-	mainLayout->addWidget(lightThemeButton);
+//	mainLayout->addWidget(lightThemeButton);
 	mainLayout->addWidget(textTypeBox);
 	mainLayout->addWidget(checkBox);
 	mainLayout->addWidget(fontSelectButton);
+	mainLayout->addWidget(syncTypeCheckBox);
+	mainLayout->addLayout(lineEditLay);
 	mainLayout->addLayout(okButtonLayout);
     setFixedSize(300, 300);
     setLayout(mainLayout);
@@ -95,9 +136,17 @@ short AppearanceSettings::getTextType() const
     return this->textType + 1;
 }
 
+QString AppearanceSettings::getUrl() {
+    return this->mbUrl;
+}
+
 QFont AppearanceSettings::getNewFont()
 {
     return this->selectedFont;
+}
+
+QString AppearanceSettings::getSyncType() {
+    return this->syncType;
 }
 
 AppearanceSettings::~AppearanceSettings() = default;

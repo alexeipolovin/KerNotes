@@ -35,7 +35,7 @@ class AppearanceSettings: public QWidget
 public:
 
 
-    explicit AppearanceSettings(QWidget *parent = nullptr, int index = 1, bool lightTheme = false);
+    explicit AppearanceSettings(QWidget *parent = nullptr, int index = 1, bool lightTheme = false, QString syncType = "Binary", QString url = "ws://localhost:12345");
 
 	QFont selectedFont;
 
@@ -52,7 +52,15 @@ public:
     QFont getNewFont();
 
 	short textType;
+
+	QString syncType;
+
+	QString getSyncType();
+	QString mbUrl;
+	QString getUrl();
 signals:
+    void newUrl();
+    void newSyncType();
     void newFontSelected();
     void lightThemeEnabled();
     void textTypeChanged();

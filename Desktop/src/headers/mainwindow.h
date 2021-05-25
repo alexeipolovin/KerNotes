@@ -31,11 +31,14 @@
 #include <QToolBar>
 #include <QTreeView>
 #include <QFileSystemModel>
+#include <QSystemTrayIcon>
 #include <libraries/markdownhighliter/markdownhighlighter.h>
 //#include <QWebEngineView>
 #include "untextedit.h"
 #include "webconnector.h"
 #include "libraries/qjsontreeview/qjsonmodel.h"
+#include "socketclient.h"
+#include "appearancesettings.h"
 
 #define TYPE_SETTINGS "settings/file_type"
 #define FIRST_STARTUP "settings/first_startup"
@@ -45,6 +48,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
+    QString syncType = "Binary";
+
+    AppearanceSettings *w;
+    QSystemTrayIcon *systemTrayIcon;
+
+    SocketClient *socketClient;
+
     WebConnector *webConnector;
 
     QToolBar *toolBar;
