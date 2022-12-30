@@ -57,25 +57,14 @@ set(PROJECT_SOURCES
         libraries/markdownhighliter/ui_qplaintexteditsearchwidget.h
         )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(KerNotes
-            ${PROJECT_SOURCES}
-            )
-else()
-    if(ANDROID)
-        add_library(KerNotes SHARED
-                ${PROJECT_SOURCES}
-                )
-    else()
-        add_executable(KerNotes
-                ${PROJECT_SOURCES}
-                )
-    endif()
-endif()
+add_executable(KerNotes
+    ${PROJECT_SOURCES}
+    )
 
-target_link_libraries(KerNotes PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
-target_link_libraries(KerNotes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(KerNotes PRIVATE Qt${QT_VERSION_MAJOR}::Network)
-target_link_libraries(KerNotes PRIVATE Qt${QT_VERSION_MAJOR}::WebSockets)
+
+target_link_libraries(KerNotes PRIVATE Qt5::Gui)
+target_link_libraries(KerNotes PRIVATE Qt5::Widgets)
+target_link_libraries(KerNotes PRIVATE Qt5::Network)
+target_link_libraries(KerNotes PRIVATE Qt5::WebSockets)
 #target_link_libraries(KerNotes PRIVATE Qt${QT_VERSION_MAJOR}::WebEngine)
 #target_link_libraries(KerNotes PRIVATE Qt${QT_VERSION_MAJOR}::WebEngineWidgets)

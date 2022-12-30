@@ -115,8 +115,8 @@ MainWindow::MainWindow(QWidget *parent)
         // }
     connect(textEdit, &UnTextEdit::textChanged, this, [this] ()
     {
-        qDebug() << "Live preview:" << livePreview;
-        qDebug() << "Text changed event";
+       qDebug() << "Live preview:" << livePreview;
+       qDebug() << "Text changed event";
        short textType = this->textEdit->getTextType();
        qDebug() << "Editing:"<< textType;
        textEdit->setIsTextChanged(true);
